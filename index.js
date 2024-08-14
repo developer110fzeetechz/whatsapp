@@ -10,6 +10,7 @@ const VERIFY_TOKEN = "mynameisatiq"; // Replace with your actual verify token
 const ACCESS_TOKEN = "your-access-token"; // Replace with your actual access token
 
 let messages = []; // Store messages in-memory for simplicity
+console.log(messages)
 
 app.use(body_parser.json());
 app.use(express.static(path.join(__dirname, 'public'))); // Serve static files from the 'public' directory
@@ -81,7 +82,7 @@ app.post('/send-message', (req, res) => {
         })
         .catch(err => {
             console.error('Error sending message:', err);
-            res.sendStatus(500);
+            res.status(500).json({err});
         });
 });
 
