@@ -15,6 +15,7 @@ app.get('/', (req, res) => {
 });
 
 app.get('/webhook', (req, res) => {
+    console.log('called')
     const mode = req.query['hub.mode'];
     const token = req.query['hub.verify_token']; // Fixed: 'hub.verify_token' is the correct query parameter
     const challenge = req.query['hub.challenge'];
@@ -28,6 +29,7 @@ app.get('/webhook', (req, res) => {
 });
 
 app.post('/webhook', (req, res) => {
+    console.log('called post methods')
     const body = req.body;
     console.log(req.body)
 
@@ -55,13 +57,13 @@ app.post('/webhook', (req, res) => {
                     "Content-Type": "application/json"
                 }
             })
-            .then(() => {
-                res.sendStatus(200);
-            })
-            .catch(err => {
-                console.error('Error sending message:', err);
-                res.sendStatus(500);
-            });
+                .then(() => {
+                    res.sendStatus(200);
+                })
+                .catch(err => {
+                    console.error('Error sending message:', err);
+                    res.sendStatus(500);
+                });
         } else {
             res.sendStatus(404);
         }
