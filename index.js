@@ -19,11 +19,14 @@ app.get('/webhook', (req, res) => {
     const mode = req.query['hub.mode'];
     const token = req.query['hub.verify_token']; // Fixed: 'hub.verify_token' is the correct query parameter
     const challenge = req.query['hub.challenge'];
+    console.log(`Mode: ${mode}, Token: ${token}, Challenge: ${challenge}`);
 
     // Check if a token is being sent by Facebook for verification
     if (mode && token === VERIFY_TOKEN) { // Validate the token sent by Facebook
+        console.log(`Verified the webhook. Challenge: ${challenge}`); // Log the challenge for debugging purposes
         res.status(200).send(challenge);
     } else {
+        console.log()
         res.sendStatus(403); // If tokens do not match, respond with 403 Forbidden
     }
 });
