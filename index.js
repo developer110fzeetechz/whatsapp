@@ -70,27 +70,27 @@ app.post('/webhook', (req, res) => {
                 console.error('Error saving message:', err);
             });
 
-            axios({
-                method: 'POST',
-                url: `https://graph.facebook.com/v20.0/${phone}/messages?access_token=${ACCESS_TOKEN}`,
-                data: {
-                    messaging_product: "whatsapp",
-                    to: from,
-                    text: {
-                        body: `Hii I am Atiqur Rahman ${message}`
-                    }
-                },
-                headers: {
-                    "Content-Type": "application/json"
-                }
-            })
-                .then(() => {
-                    res.sendStatus(200);
-                })
-                .catch(err => {
-                    console.error('Error sending message:', err);
-                    res.sendStatus(500);
-                });
+            // axios({
+            //     method: 'POST',
+            //     url: `https://graph.facebook.com/v20.0/${phone}/messages?access_token=${ACCESS_TOKEN}`,
+            //     data: {
+            //         messaging_product: "whatsapp",
+            //         to: from,
+            //         text: {
+            //             body: `Hii I am Atiqur Rahman ${message}`
+            //         }
+            //     },
+            //     headers: {
+            //         "Content-Type": "application/json"
+            //     }
+            // })
+            //     .then(() => {
+            //         res.sendStatus(200);
+            //     })
+            //     .catch(err => {
+            //         console.error('Error sending message:', err);
+            //         res.sendStatus(500);
+            //     });
         } else {
             res.sendStatus(404);
         }
