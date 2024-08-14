@@ -62,7 +62,7 @@
     <script>
         // Fetch and display messages
         async function loadMessages() {
-            const response = await fetch('http://localhost:5000/messages');
+            const response = await fetch('https://whatsapp-j181.onrender.com/messages');
             const messages = await response.json();
 
             const messageList = document.getElementById('message-list');
@@ -84,7 +84,7 @@
             const to = document.getElementById('to').value;
             const message = document.getElementById('message').value;
 
-            await fetch('http://localhost:5000/send-message', {
+            await fetch('https://whatsapp-j181.onrender.com/send-message', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
