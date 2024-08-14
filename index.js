@@ -1,39 +1,37 @@
 const express = require('express');
 const body_parser = require('body-parser');
 const axios = require('axios');
+const path = require('path'); // Import path to work with file paths
 
 const app = express();
 const PORT = 5000;
 
 const VERIFY_TOKEN = "mynameisatiq"; // Replace with your actual verify token
-const ACCESS_TOKEN = "EAAL9E25aiJ8BO2AaSLprp4bhG5OvBg6qC07Jj1cKVjIOzTvxu8nFnNbrSTctnTmI0TUWvzBSEe6CCcS1ZAmv77Ry5u8ZC4VSDMvZCpxXmb59x7RsXOX7ewOoHZBQ0cyakooWbsdHaZCYJZAnKGR9O68OfBi5PXBjMdYx2K72ti5F9K95JpzvQZA8TAUsFZAh2yz95kvIZCnMb4SQK5JBV9ecZD"; // Replace with your actual access token
+const ACCESS_TOKEN = "your-access-token"; // Replace with your actual access token
+
+let messages = []; // Store messages in-memory for simplicity
 
 app.use(body_parser.json());
+app.use(express.static(path.join(__dirname, 'public'))); // Serve static files from the 'public' directory
 
 app.get('/', (req, res) => {
-    res.send('Working fine');
+    res.sendFile(path.join(__dirname, 'public', 'index.html')); // Serve the HTML file
 });
 
 app.get('/webhook', (req, res) => {
-    console.log('called')
     const mode = req.query['hub.mode'];
-    const token = req.query['hub.verify_token']; // Fixed: 'hub.verify_token' is the correct query parameter
+    const token = req.query['hub.verify_token'];
     const challenge = req.query['hub.challenge'];
 
-    // Check if a token is being sent by Facebook for verification
-    if (mode && token === VERIFY_TOKEN) { // Validate the token sent by Facebook
-        console.log(`Verified the webhook. Challenge: ${challenge}`); // Log the challenge for debugging purposes
+    if (mode && token === VERIFY_TOKEN) {
         res.status(200).send(challenge);
     } else {
-        console.log('else')
-        res.sendStatus(403); // If tokens do not match, respond with 403 Forbidden
+        res.sendStatus(403);
     }
 });
 
 app.post('/webhook', (req, res) => {
-
     const body = req.body;
-    console.log(JSON.stringify(body, null, 2));
 
     if (body.object === 'whatsapp_business_account') {
         if (body.entry &&
@@ -45,37 +43,46 @@ app.post('/webhook', (req, res) => {
             const from = body.entry[0].changes[0].value.messages[0].from;
             const message = body.entry[0].changes[0].value.messages[0].text.body;
 
+            // Store the message
+            messages.push({ from, message });
 
-            console.log({phone})
-            console.log({from})
-            console.log({message})
-            axios({
-                method: 'POST',
-                url: `https://graph.facebook.com/v20.0/${phone}/messages?access_token=${ACCESS_TOKEN}`,
-                data: {
-                    messaging_product: "whatsapp",
-                    to: from,
-                    text: {
-                        body: `Hii I am Atiqur Rahman ${message}`
-                    }
-                },
-                headers: { // Fixed typo: 'Headers' to 'headers'
-                    "Content-Type": "application/json"
-                }
-            })
-                .then(() => {
-                    res.sendStatus(200);
-                })
-                .catch(err => {
-                    console.error('Error sending message:', err);
-                    res.sendStatus(500);
-                });
+            res.sendStatus(200);
         } else {
             res.sendStatus(404);
         }
     } else {
         res.sendStatus(404);
     }
+});
+
+// API to get all messages
+app.get('/messages', (req, res) => {
+    res.json(messages);
+});
+
+// API to send a message
+app.post('/send-message', (req, res) => {
+    const { to, message } = req.body;
+
+    axios({
+        method: 'POST',
+        url: `https://graph.facebook.com/v20.0/${to}/messages?access_token=${ACCESS_TOKEN}`,
+        data: {
+            messaging_product: "whatsapp",
+            to,
+            text: { body: message }
+        },
+        headers: {
+            "Content-Type": "application/json"
+        }
+    })
+        .then(() => {
+            res.sendStatus(200);
+        })
+        .catch(err => {
+            console.error('Error sending message:', err);
+            res.sendStatus(500);
+        });
 });
 
 app.listen(PORT, () => {

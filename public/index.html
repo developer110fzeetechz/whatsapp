@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            width: 80%;
+            margin: auto;
+        }
+        .message-list {
+            margin-top: 20px;
+        }
+        .message-item {
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+        }
+        .message-item h3 {
+            margin: 0;
+        }
+        .send-form {
+            margin-top: 20px;
+        }
+        .send-form input, .send-form textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .send-form button {
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Admin Panel</h1>
+        <div class="message-list" id="message-list">
+            <!-- Messages will be loaded here -->
+        </div>
+
+        <div class="send-form">
+            <h2>Send Message</h2>
+            <input type="text" id="to" placeholder="Recipient Number (e.g., +1234567890)">
+            <textarea id="message" placeholder="Type your message here"></textarea>
+            <button onclick="sendMessage()">Send</button>
+        </div>
+    </div>
+
+    <script>
+        // Fetch and display messages
+        async function loadMessages() {
+            const response = await fetch('http://localhost:5000/messages');
+            const messages = await response.json();
+
+            const messageList = document.getElementById('message-list');
+            messageList.innerHTML = '';
+
+            messages.forEach(msg => {
+                const messageItem = document.createElement('div');
+                messageItem.className = 'message-item';
+                messageItem.innerHTML = `
+                    <h3>From: ${msg.from}</h3>
+                    <p>${msg.message}</p>
+                `;
+                messageList.appendChild(messageItem);
+            });
+        }
+
+        // Send a message
+        async function sendMessage() {
+            const to = document.getElementById('to').value;
+            const message = document.getElementById('message').value;
+
+            await fetch('http://localhost:5000/send-message', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ to, message })
+            });
+
+            alert('Message sent!');
+            document.getElementById('to').value = '';
+            document.getElementById('message').value = '';
+        }
+
+        // Load messages on page load
+        loadMessages();
+    </script>
+</body>
+</html>
