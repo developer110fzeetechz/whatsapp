@@ -19,22 +19,21 @@ app.get('/webhook', (req, res) => {
     const mode = req.query['hub.mode'];
     const token = req.query['hub.verify_token']; // Fixed: 'hub.verify_token' is the correct query parameter
     const challenge = req.query['hub.challenge'];
-    console.log(`Mode: ${mode}, Token: ${token}, Challenge: ${challenge}`);
 
     // Check if a token is being sent by Facebook for verification
     if (mode && token === VERIFY_TOKEN) { // Validate the token sent by Facebook
         console.log(`Verified the webhook. Challenge: ${challenge}`); // Log the challenge for debugging purposes
         res.status(200).send(challenge);
     } else {
-        console.log()
+        console.log('else')
         res.sendStatus(403); // If tokens do not match, respond with 403 Forbidden
     }
 });
 
 app.post('/webhook', (req, res) => {
-    console.log('called post methods')
+
     const body = req.body;
-    console.log(req.body)
+    console.log(JSON.stringify(body_param, null, 2));
 
     if (body.object === 'whatsapp_business_account') {
         if (body.entry &&
@@ -46,6 +45,10 @@ app.post('/webhook', (req, res) => {
             const from = body.entry[0].changes[0].value.messages[0].from;
             const message = body.entry[0].changes[0].value.messages[0].text.body;
 
+
+            console.log({phone})
+            console.log({from})
+            console.log({message})
             axios({
                 method: 'POST',
                 url: `https://graph.facebook.com/v20.0/${phone}/messages?access_token=${ACCESS_TOKEN}`,
@@ -53,7 +56,7 @@ app.post('/webhook', (req, res) => {
                     messaging_product: "whatsapp",
                     to: from,
                     text: {
-                        body: "Hii I am Atiqur Rahman"
+                        body: `Hii I am Atiqur Rahman ${message}`
                     }
                 },
                 headers: { // Fixed typo: 'Headers' to 'headers'
