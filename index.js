@@ -33,7 +33,7 @@ app.get('/webhook', (req, res) => {
 app.post('/webhook', (req, res) => {
 
     const body = req.body;
-    console.log(JSON.stringify(body_param, null, 2));
+    console.log(JSON.stringify(body, null, 2));
 
     if (body.object === 'whatsapp_business_account') {
         if (body.entry &&
