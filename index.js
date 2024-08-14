@@ -24,7 +24,7 @@ app.get('/webhook', (req, res) => {
     } else {
         res.sendStatus(403)
     }
-    res.send('Hello World!')
+    
 })
 
 
